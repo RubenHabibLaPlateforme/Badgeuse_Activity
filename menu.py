@@ -85,6 +85,7 @@ def start_rfid_thread(part2_frame, canvas, part3_frame, data_badges):
 
 
 def read_rfid(part2_frame, canvas, part3_frame, data_badges):
+    print("Lecture en cours")
     while True:
 
         # print("READ RFID")
@@ -108,11 +109,14 @@ def read_rfid(part2_frame, canvas, part3_frame, data_badges):
             if sw1 == 0x90 and sw2 == 0x00:
                 # Inverser l'ordre des octets dans la variable response
                 response_reversed = response[::-1]
+                # print(response_reversed)
                 card_id = int(toHexString(
                     response_reversed).replace(" ", ""), 16)
-                print(card_id)
+                # print("Card Id ")
+                # print(card_id)
+                # print("fin card id")
                 student_email = get_student_by_badge(data_badges, card_id)
-                print(student_email)
+                # print("Email student " + student_email)
                 if student_email:
                     on_email_click(student_email, part2_frame,
                                    part3_frame, canvas, -1)  # -1, pour dire que la fonction est appelée via la lecture de carte. De ce fait, l'étudiant ne sera pas rebasculé de la liste de présents à la liste des absents
@@ -244,7 +248,7 @@ def feed_students_list(unit_id):
     global students_list
 
     token = main.read_in_file("token_laplateforme")
-    url = f"https://preprod-api.laplateforme.io/unit/student?student_email=&unit_id={unit_id}"
+    url = f"https://api.laplateforme.io/unit/student?student_email=&unit_id={unit_id}"
     print("Token pour la requête : ", token)
 
     headers = {"token": token}
@@ -303,7 +307,7 @@ def on_validate_click(selected_option_unit, selected_option_activity, units, can
     print(f"Nom de l'activité: {selected_option_activity}")
     print(f"Nom du mail: {google_auth_script.user_email}")
 
-    url = "https://preprod-api.laplateforme.io/activity"
+    url = "https://api.laplateforme.io/activity"
 
     # data = {
     #     "present_students": students_presents,  # Obligatoire, chaîne de caractères
@@ -337,7 +341,7 @@ def create_window(data_badges, token):
     print("DEBUT CREATE WINDOW")
 
     units = get_units(
-        "https://preprod-api.laplateforme.io/unit?unit_code=&unit_id&is_active=1",
+        "https://api.laplateforme.io/unit?unit_code=&unit_id&is_active=1",
         token)
     print(units)
     if units != None:

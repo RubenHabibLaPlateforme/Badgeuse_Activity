@@ -25,7 +25,7 @@ def read_in_file(nom_fichier):
 
 def get_laplateforme_token(token):
 
-    url = "https://preprod-auth.laplateforme.io/oauth"
+    url = "https://auth.laplateforme.io/oauth"
 
     print("Token pour la requête : ", token)
 
@@ -59,7 +59,7 @@ def get_laplateforme_token(token):
 
 def get_data_badges():
     token = read_in_file("token_laplateforme")
-    url = f"https://preprod-api.laplateforme.io/student?badge=&email="
+    url = f"https://api.laplateforme.io/student?badge=&email="
     headers = {"token": token}
     try:
         response = requests.get(url, headers=headers)
