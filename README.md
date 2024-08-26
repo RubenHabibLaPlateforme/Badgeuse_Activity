@@ -1,5 +1,7 @@
 # Badgeuse_Activity
 
+Version Python : 3.10.0
+
 Installer les dépendances nécessaires
 Lancer le fichier main.py
 Sélectionner le type d'activité
