@@ -1,5 +1,6 @@
 import tkinter as tk
 from PIL import Image, ImageTk
+from tkinter import messagebox
 
 import requests
 import main
@@ -293,13 +294,22 @@ def formate_students_list():
     return result
 
 
-def on_validate_click(selected_option_unit, selected_option_activity, units, canvas, scrollable_frame, part3_frame):
+def on_validate_click(selected_option_unit, is_mandatory, selected_option_activity, units, canvas, scrollable_frame, part3_frame):
+    global students_list, students_presents
+
+    print(is_mandatory)
+
+    confirmation = messagebox.askyesno(
+        "Confirmation", "Êtes-vous sûr de vouloir valider votre appel ?")
+
+    if not confirmation:
+        print("Opération annulée par l'utilisateur.")
+        return
+
     selected_id = None
     for unit in units:
         if unit["name"] == selected_option_unit:
             selected_id = unit["id"]
-            # feed_students_list(selected_id)
-            # display_part_2(scrollable_frame, canvas, part3_frame)
             break
 
     print(f"Students présents: {students_presents}")
@@ -309,30 +319,63 @@ def on_validate_click(selected_option_unit, selected_option_activity, units, can
 
     url = "https://api.laplateforme.io/activity"
 
-    # data = {
-    #     "present_students": students_presents,  # Obligatoire, chaîne de caractères
-    #     "activity_type": selected_option_activity,  # Obligatoire, chaîne de caractères
-    #     "is_mandatory": 1,                      # Obligatoire, booléen
-    #     "unit_id": selected_id,                    # Obligatoire, nombre
-    #     "author": google_auth_script.user_email,   # Obligatoire, chaîne de caractères
-    # }
-    payload = 'activity_type='+selected_option_activity + \
-        '&unit_id='+str(selected_id) + \
-        '&author='+google_auth_script.user_email + \
-        '&is_mandatory='+str(1) + \
-        formate_students_list()
-    # En-têtes HTTP (Headers)
+    payload = (
+        f'activity_type={selected_option_activity}'
+        f'&unit_id={selected_id}'
+        f'&author={google_auth_script.user_email}'
+        f'&is_mandatory={int(is_mandatory)}'
+        f'{formate_students_list()}'
+    )
+
     headers = {
         "token": main.read_in_file("token_laplateforme")
-
     }
+
     print("----------------")
     print(payload)
-
     print("----------------")
 
     response = requests.request("POST", url, headers=headers, data=payload)
-    print(f"Réponse de l'API : {response.json()}")
+
+    try:
+        response_data = response.json()
+        print(f"Réponse de l'API : {response_data}")
+
+        if isinstance(response_data, int):
+            # Success pop-up
+            messagebox.showinfo(
+                "Succès", "La validation a été faite avec succès !")
+
+            # Vider les listes des étudiants
+            students_list.clear()
+            students_presents.clear()
+
+            # Vider les parties part2 et part3
+            for widget in scrollable_frame.winfo_children():
+                widget.destroy()
+            for widget in part3_frame.winfo_children():
+                widget.destroy()
+
+            # Mettre à jour le canvas pour refléter les changements
+            canvas.update_idletasks()
+            canvas.config(scrollregion=canvas.bbox("all"))
+
+        else:
+            # Error pop-up
+            messagebox.showerror(
+                "Erreur", "Erreur lors de la validation, quittez le programme et relancez le")
+    except ValueError:
+        print("Erreur: La réponse de l'API n'est pas au format JSON.")
+        messagebox.showerror(
+            "Erreur", "Erreur lors de la validation, réponse non JSON. Quittez le programme et relancez le")
+
+
+def on_closing(root):
+    os.remove("auth_token_laplateforme")
+    os.remove("token_laplateforme")
+    os.remove("token.json")
+    os.remove("token_google_id")
+    root.destroy()  # Close the Tkinter window
 
 
 def create_window(data_badges, token):
@@ -354,6 +397,9 @@ def create_window(data_badges, token):
         root.title("Gestion des Unités")
         root.configure(bg="#f0f0f0")
         img = Image.open("logo_laplateforme.jpg")
+
+        root.protocol("WM_DELETE_WINDOW", lambda: on_closing(root))
+
         tk_img = ImageTk.PhotoImage(img)
 
         # Obtenir la taille de l'écran
@@ -371,6 +417,20 @@ def create_window(data_badges, token):
             part1, text="Accompagnateur : " + google_auth_script.user_email,
             padx=10, bg='#2c3e50', fg='white', font=("Helvetica", 12, "bold"))
         label_accompagnateur.pack(side=tk.LEFT)
+
+        # Case à cocher "obligatoire"
+        is_mandatory_var = tk.BooleanVar(value=True)
+        mandatory_checkbox = tk.Checkbutton(
+            part1,
+            text="Obligatoire",
+            variable=is_mandatory_var,
+            bg='#2c3e50',      # Background color of the checkbox
+            fg='white',        # Foreground (text) color
+            selectcolor='green',  # Color of the checkbox when selected
+            activebackground='#2c3e50',  # Background color when active
+            activeforeground='white'      # Foreground color when active
+        )
+        mandatory_checkbox.pack(side=tk.LEFT, padx=10)
 
         # Menu déroulant pour les options
         options = ["Activite", "Consultation technique", "How to", "Kick-off", "Soutenance",
@@ -394,7 +454,7 @@ def create_window(data_badges, token):
 
         # Bouton Valider l'appel
         btn_valider = tk.Button(part1, text="Valider", padx=10, command=lambda: on_validate_click(
-            unit_var.get(), option_var.get(), units, canvas, scrollable_frame, part3), bg='#27ae60', fg='white')
+            unit_var.get(), int(is_mandatory_var.get()), option_var.get(), units, canvas, scrollable_frame, part3), bg='#27ae60', fg='white')
         btn_valider.pack(side=tk.LEFT, padx=10)
 
         # Partie 2 : 50% de la largeur, 90% de la hauteur avec barre de défilement

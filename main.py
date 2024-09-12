@@ -81,6 +81,25 @@ def get_data_badges():
         print("Une erreur est survenue lors de la requête :", e)
 
 
+def delete_tokens():
+    # Liste des noms de fichiers à supprimer
+    fichiers_a_supprimer = ['token_google_id',
+                            'token_laplateforme', 'token.json', 'auth_token_laplateforme']
+
+    # Parcourir chaque fichier dans la liste
+    for fichier in fichiers_a_supprimer:
+        # Vérifier si le fichier existe
+        if os.path.isfile(fichier):
+            try:
+                os.remove(fichier)  # Supprimer le fichier
+                print(f"Le fichier '{fichier}' a été supprimé.")
+            except Exception as e:
+                print(
+                    f"Erreur lors de la suppression du fichier '{fichier}': {e}")
+        else:
+            print(f"Le fichier '{fichier}' n'existe pas.")
+
+
 def main():
     # google_auth_script.authenticate()
     # read_in_file("token_google_id")
@@ -121,13 +140,6 @@ def main():
                     data_badges, read_in_file("token_laplateforme"))
 
 
-def tache_a_la_fermeture():
-    os.remove("auth_token_laplateforme")
-    os.remove("token_laplateforme")
-    os.remove("token.json")
-    os.remove("token_google_id")
-
-
 if __name__ == "__main__":
+    delete_tokens()
     main()
-    atexit.register(tache_a_la_fermeture)
