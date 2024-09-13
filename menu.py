@@ -291,6 +291,9 @@ def formate_students_list():
         # Ajouter la valeur formatée à la chaîne de caractères résultat
         result += f"&present_students[]={value}"
 
+    if result == "":
+        result = "&present_students[]=''"
+
     return result
 
 
