@@ -2,7 +2,8 @@ import google_auth_script
 import requests
 import atexit
 import os
-
+import threading
+import time
 
 def read_in_file(nom_fichier):
     """
@@ -24,7 +25,6 @@ def read_in_file(nom_fichier):
 
 
 def get_laplateforme_token(token):
-
     url = "https://auth.laplateforme.io/oauth"
 
     print("Token pour la requête : ", token)
@@ -55,6 +55,17 @@ def get_laplateforme_token(token):
     except requests.exceptions.RequestException as e:
         print("Une erreur est survenue lors de la requête :", e)
     return 1
+
+
+def refresh_token_periodically(interval=900):
+    while True:
+        print("Rafraîchissement du token...")
+        token_google_id = read_in_file("token_google_id")
+        if token_google_id != -1:
+            get_laplateforme_token(read_in_file("token_google_id"))
+        else:
+            print("Erreur: Token Google ID introuvable.")
+        time.sleep(interval)
 
 
 def get_data_badges():
@@ -101,44 +112,29 @@ def delete_tokens():
 
 
 def main():
-    # google_auth_script.authenticate()
-    # read_in_file("token_google_id")
-    # get_laplateforme_token(read_in_file("token_google_id"))
-    # menu.create_window()
+    # Démarre un thread pour rafraîchir le token toutes les 15 minutes
+    refresh_thread = threading.Thread(target=refresh_token_periodically)
+    refresh_thread.daemon = True
+    refresh_thread.start()
 
     token_google_id = read_in_file("token_google_id")
     if token_google_id != -1:
-        get_laplateforme_token_result = get_laplateforme_token(
-            read_in_file("token_google_id"))
+        get_laplateforme_token_result = get_laplateforme_token(read_in_file("token_google_id"))
         if get_laplateforme_token_result:
-            # print('3')
-
             import menu
             data_badges = get_data_badges()
             print(data_badges)
-
-            # data_badges = menu.lire_fichier_gsheets(
-            #     "https://docs.google.com/spreadsheets/d/1GTcdEXoydBhbubKlh2sDS29TyL8_h14CO8NbKbYMDb8/edit#gid=0")
-
             menu.create_window(data_badges, read_in_file("token_laplateforme"))
     else:
         google_auth_script.authenticate()
         token_google_id = read_in_file("token_google_id")
         if token_google_id != -1:
-            get_laplateforme_token_result = get_laplateforme_token(
-                read_in_file("token_google_id"))
+            get_laplateforme_token_result = get_laplateforme_token(read_in_file("token_google_id"))
             if get_laplateforme_token_result:
-                # print('3')
-
                 import menu
                 data_badges = get_data_badges()
-                # data_badges = menu.lire_fichier_gsheets(
-                #     "https://docs.google.com/spreadsheets/d/1GTcdEXoydBhbubKlh2sDS29TyL8_h14CO8NbKbYMDb8/edit#gid=0")
                 print(data_badges)
-
-                menu.create_window(
-                    data_badges, read_in_file("token_laplateforme"))
-
+                menu.create_window(data_badges, read_in_file("token_laplateforme"))
 
 if __name__ == "__main__":
     delete_tokens()
