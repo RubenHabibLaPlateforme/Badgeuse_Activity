@@ -24,8 +24,12 @@ def read_in_file(nom_fichier):
         return -1
 
 
-def get_laplateforme_token(token):
-    url = "https://auth.laplateforme.io/oauth"
+def get_laplateforme_token(token, refresh=False):
+    if refresh:
+        url = "https://auth.laplateforme.io/refresh"
+    else:
+        url = "https://auth.laplateforme.io/oauth"
+
 
     print("Token pour la requête : ", token)
 
@@ -57,14 +61,15 @@ def get_laplateforme_token(token):
     return 1
 
 
-def refresh_token_periodically(interval=900):
+def refresh_token_periodically(interval=15 * 60):
     while True:
         print("Rafraîchissement du token...")
         token_google_id = read_in_file("token_google_id")
         if token_google_id != -1:
-            get_laplateforme_token(read_in_file("token_google_id"))
+            get_laplateforme_token(token_google_id, refresh=True)
         else:
-            print("Erreur: Token Google ID introuvable.")
+            print(f"Erreur: Token Google ID {token_google_id} introuvable.")
+
         time.sleep(interval)
 
 
