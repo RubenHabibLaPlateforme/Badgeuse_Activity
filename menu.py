@@ -78,6 +78,7 @@ def lire_fichier_gsheets(url):
 
 
 def start_rfid_thread(part2_frame, canvas, part3_frame, data_badges):
+    print("Thread")
     thread = threading.Thread(target=read_rfid, args=(
         part2_frame, canvas, part3_frame, data_badges))
     # Le thread s'exécutera en arrière-plan et se terminera lorsque l'application principale se fermera
