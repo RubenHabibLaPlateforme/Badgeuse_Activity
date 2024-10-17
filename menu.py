@@ -338,28 +338,23 @@ def csv_save(selected_option_unit, selected_option_activity, students_presents):
     print("------------CSV Start-----------------")
     os.makedirs("logs", exist_ok=True)
 
-    # Obtenir la date et l'heure actuelles
     now = datetime.now()
-    date_str = now.strftime("%d-%m-%Y_%H-%M")  # Format : jj-mm-aaaa_heure
+    date_str = now.strftime("%d-%m-%Y_%H-%M")
     selected_option_activity_clean = selected_option_activity.replace(
         "\\", "").replace("\n", "-")
 
-    # Créer le nom du fichier basé sur la date, l'heure et l'activité sélectionnée
     fichier_nom = f"{date_str}_{selected_option_activity_clean}.csv"
 
     fichier_chemin = os.path.join("./logs/", fichier_nom)
 
     try:
-        # Ouvrir le fichier CSV pour écrire dedans
         with open(fichier_chemin, mode="w", newline="", encoding="utf-8") as fichier_csv:
             writer = csv.writer(fichier_csv)
 
-            # Écrire selected_option_unit et selected_option_activity avec un retour à la ligne
             writer.writerow([selected_option_unit])
             writer.writerow([selected_option_activity])
 
-            # Écrire la liste des étudiants présents
-            writer.writerow([])  # Ligne vide pour séparer
+            writer.writerow([])
             for student in students_presents:
                 writer.writerow([student])
 
@@ -377,13 +372,12 @@ def on_validate_click(selected_option_unit, is_mandatory, selected_option_activi
 
     if (selected_option_activity == "Activite"):
         root = tk.Tk()
-        root.withdraw()  # Cacher la fenêtre principale de tkinter
+        root.withdraw()
 
-        # Afficher une boîte de dialogue avec un seul bouton "OK"
         messagebox.showwarning(
             "Attention", "Veuillez sélectionner une activité avant de valider.")
-        root.destroy()  # Détruire la fenêtre après la fermeture de la pop-up
-        return  # Quitter la fonction
+        root.destroy()
+        return
 
     confirmation = messagebox.askyesno(
         "Confirmation", "Êtes-vous sûr de vouloir valider votre appel ?")
@@ -483,8 +477,6 @@ def create_window(data_badges, token):
         token)
     print("units récupérées")
     if units != None:
-        for unit_code in units:
-            print(unit_code)
         units_code = [unit["name"] for unit in units]
         units_id = [unit["id"] for unit in units]
 

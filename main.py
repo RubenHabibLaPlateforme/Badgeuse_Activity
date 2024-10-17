@@ -41,14 +41,14 @@ def get_laplateforme_token(token):
         response = requests.post(url, data=formdata, headers=headers)
 
         if response.status_code == 200:
-            print("Réponse reçue :")
+            print("Réponse reçue avec succès")
             response_data = response.json()
             google_auth_script.write_in_file(
                 "auth_token_laplateforme", response_data.get("authtoken"))
             google_auth_script.write_in_file(
                 "token_laplateforme", response_data.get("token"))
 
-            print(response.json())
+            # print(response.json())
         else:
             print("La requête a échoué avec le statut", response.status_code)
             print(response.text)
@@ -64,9 +64,9 @@ def get_data_badges():
     try:
         response = requests.get(url, headers=headers)
         if response.status_code == 200:
-            print("Réponse reçue :")
+            print("Réponse reçue avec succès")
             response_data = response.json()
-            print(response_data)
+            # print(response_data)
             # data_badges = [entry['student_email'] for entry in response_data]
             # print("Students List updated:", students_list)
             data_badges = []
@@ -115,7 +115,7 @@ def main():
 
             import menu
             data_badges = get_data_badges()
-            print(data_badges)
+            # print(data_badges)
 
             # data_badges = menu.lire_fichier_gsheets(
             #     "https://docs.google.com/spreadsheets/d/1GTcdEXoydBhbubKlh2sDS29TyL8_h14CO8NbKbYMDb8/edit#gid=0")
@@ -134,7 +134,7 @@ def main():
                 data_badges = get_data_badges()
                 # data_badges = menu.lire_fichier_gsheets(
                 #     "https://docs.google.com/spreadsheets/d/1GTcdEXoydBhbubKlh2sDS29TyL8_h14CO8NbKbYMDb8/edit#gid=0")
-                print(data_badges)
+                # print(data_badges)
 
                 menu.create_window(
                     data_badges, read_in_file("token_laplateforme"))
