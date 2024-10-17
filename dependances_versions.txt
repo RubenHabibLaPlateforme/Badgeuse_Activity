@@ -1,0 +1,16 @@
+PIL: Version non trouvée
+atexit: Module standard (Python)
+csv: Module standard (Python)
+datetime: Module standard (Python)
+google_auth_script: Module standard (Python)
+gspread: 6.0.2
+main: Module standard (Python)
+menu: Module standard (Python)
+oauth2client.service_account: Version non trouvée
+os: Module standard (Python)
+requests: 2.31.0
+smartcard.System: Version non trouvée
+smartcard.util: Version non trouvée
+threading: Module standard (Python)
+time: Module standard (Python)
+tkinter: Module standard (Python)

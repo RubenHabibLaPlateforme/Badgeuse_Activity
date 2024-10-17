@@ -12,6 +12,8 @@ from oauth2client.service_account import ServiceAccountCredentials
 import threading
 import time
 import os
+import csv
+from datetime import datetime
 
 
 students_list = []
@@ -33,15 +35,10 @@ def get_student_by_badge(data_listing, card):
             row = data_listing[index]
             badge_number = row[1]
             if (badge_number):
-                # print(int(badge_number))
-                # print("BADGE == " + badge_number)
                 if int(badge_number) == card:
                     try:
-                        # badge_number = int(row[1])
                         badge_number = int(badge_number)
-                        print(type(badge_number))
                         if badge_number == card:
-                            print("TROUVE")
                             student = row[0]
                             break
                     except ValueError:
@@ -78,7 +75,7 @@ def lire_fichier_gsheets(url):
 
 
 def start_rfid_thread(part2_frame, canvas, part3_frame, data_badges):
-    print("Thread")
+    print("Thread starts")
     thread = threading.Thread(target=read_rfid, args=(
         part2_frame, canvas, part3_frame, data_badges))
     # Le thread s'exécutera en arrière-plan et se terminera lorsque l'application principale se fermera
@@ -179,7 +176,27 @@ def display_part_2(part2_frame, canvas, part3_frame):
 
 
 def refresh_token():
-    print("test")
+    print("------------REFRESH TOKEN START-----------------")
+    authtoken = main.read_in_file("auth_token_laplateforme")
+    url = "https://auth.laplateforme.io/refresh"
+    data = {
+        'authtoken': authtoken
+    }
+    try:
+        response = requests.post(url, data=data)
+
+        if response.status_code == 200:
+            response_json = response.json()
+            os.remove("token_laplateforme")
+            google_auth_script.write_in_file(
+                "token_laplateforme",  response_json.get('token', None))
+            print("------------REFRESH TOKEN END-----------------")
+
+            return 1
+        else:
+            return f"Error: {response.status_code} - {response.text}"
+    except requests.exceptions.RequestException as e:
+        return f"Request failed: {str(e)}"
 
 
 def get_units(url, token):
@@ -190,8 +207,17 @@ def get_units(url, token):
     headers = {"token": token}
     try:
         response = requests.get(url, headers=headers)
+
+        while response.status_code == 402:
+            refresh_token()
+            headers = {
+                "token": main.read_in_file("token_laplateforme")
+            }
+            response = requests.request(
+                "POST", url, headers=headers)
+
         if response.status_code == 200:
-            print("Réponse reçue :")
+            print("Réponse 200 de l'API : Units reçues")
             response_data = response.json()
             units = [{"id": entry["unit_id"], "name": entry["unit_code"]}
                      for entry in response_data]
@@ -256,11 +282,20 @@ def feed_students_list(unit_id):
     headers = {"token": token}
     try:
         response = requests.get(url, headers=headers)
+
+        while response.status_code == 402:
+            refresh_token()
+            headers = {
+                "token": main.read_in_file("token_laplateforme")
+            }
+            response = requests.request(
+                "POST", url, headers=headers)
+
         if response.status_code == 200:
             print("Réponse reçue :")
             response_data = response.json()
             students_list = [entry['student_email'] for entry in response_data]
-            print("Students List updated:", students_list)
+            print("La liste de students a été updated")
         else:
             print("La requête a échoué avec le statut", response.status_code)
             print(response.text)
@@ -298,10 +333,57 @@ def formate_students_list():
     return result
 
 
+def csv_save(selected_option_unit, selected_option_activity, students_presents):
+
+    print("------------CSV Start-----------------")
+    os.makedirs("logs", exist_ok=True)
+
+    # Obtenir la date et l'heure actuelles
+    now = datetime.now()
+    date_str = now.strftime("%d-%m-%Y_%H-%M")  # Format : jj-mm-aaaa_heure
+    selected_option_activity_clean = selected_option_activity.replace(
+        "\\", "").replace("\n", "-")
+
+    # Créer le nom du fichier basé sur la date, l'heure et l'activité sélectionnée
+    fichier_nom = f"{date_str}_{selected_option_activity_clean}.csv"
+
+    fichier_chemin = os.path.join("./logs/", fichier_nom)
+
+    try:
+        # Ouvrir le fichier CSV pour écrire dedans
+        with open(fichier_chemin, mode="w", newline="", encoding="utf-8") as fichier_csv:
+            writer = csv.writer(fichier_csv)
+
+            # Écrire selected_option_unit et selected_option_activity avec un retour à la ligne
+            writer.writerow([selected_option_unit])
+            writer.writerow([selected_option_activity])
+
+            # Écrire la liste des étudiants présents
+            writer.writerow([])  # Ligne vide pour séparer
+            for student in students_presents:
+                writer.writerow([student])
+
+        print("------------CSV End Success-----------------")
+
+    except Exception as e:
+        print(f"Erreur lors de la création du fichier log : {str(e)}")
+
+
 def on_validate_click(selected_option_unit, is_mandatory, selected_option_activity, units, canvas, scrollable_frame, part3_frame):
     global students_list, students_presents
 
+    print("Obligatoire (1) ou non (2) = ")
     print(is_mandatory)
+
+    if (selected_option_activity == "Activite"):
+        root = tk.Tk()
+        root.withdraw()  # Cacher la fenêtre principale de tkinter
+
+        # Afficher une boîte de dialogue avec un seul bouton "OK"
+        messagebox.showwarning(
+            "Attention", "Veuillez sélectionner une activité avant de valider.")
+        root.destroy()  # Détruire la fenêtre après la fermeture de la pop-up
+        return  # Quitter la fonction
 
     confirmation = messagebox.askyesno(
         "Confirmation", "Êtes-vous sûr de vouloir valider votre appel ?")
@@ -320,6 +402,8 @@ def on_validate_click(selected_option_unit, is_mandatory, selected_option_activi
     print(f"ID de l'unité sélectionnée: {selected_id}")
     print(f"Nom de l'activité: {selected_option_activity}")
     print(f"Nom du mail: {google_auth_script.user_email}")
+
+    csv_save(selected_option_unit, selected_option_activity, students_presents)
 
     url = "https://api.laplateforme.io/activity"
 
@@ -340,10 +424,17 @@ def on_validate_click(selected_option_unit, is_mandatory, selected_option_activi
     print("----------------")
 
     response = requests.request("POST", url, headers=headers, data=payload)
+    while response.status_code == 402:
+        refresh_token()
+        headers = {
+            "token": main.read_in_file("token_laplateforme")
+        }
+        response = requests.request(
+            "POST", url, headers=headers, data=payload)
 
     try:
         response_data = response.json()
-        print(f"Réponse de l'API : {response_data}")
+        # print(f"Réponse de l'API : {response_data}")
 
         if isinstance(response_data, int):
             # Success pop-up
@@ -390,7 +481,7 @@ def create_window(data_badges, token):
     units = get_units(
         "https://api.laplateforme.io/unit?unit_code=&unit_id&is_active=1",
         token)
-    print(units)
+    print("units récupérées")
     if units != None:
         for unit_code in units:
             print(unit_code)
