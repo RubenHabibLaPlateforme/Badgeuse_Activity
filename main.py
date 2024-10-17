@@ -73,6 +73,7 @@ def get_data_badges():
             for item in response_data:
                 ligne = [item["student_email"], item["student_badge"]]
                 data_badges.append(ligne)
+
             return data_badges
         else:
             print("La requête a échoué avec le statut", response.status_code)
@@ -101,43 +102,18 @@ def delete_tokens():
 
 
 def main():
-    # google_auth_script.authenticate()
-    # read_in_file("token_google_id")
-    # get_laplateforme_token(read_in_file("token_google_id"))
-    # menu.create_window()
-
+    google_auth_script.authenticate()
     token_google_id = read_in_file("token_google_id")
     if token_google_id != -1:
         get_laplateforme_token_result = get_laplateforme_token(
             read_in_file("token_google_id"))
         if get_laplateforme_token_result:
-            # print('3')
 
             import menu
             data_badges = get_data_badges()
-            # print(data_badges)
-
-            # data_badges = menu.lire_fichier_gsheets(
-            #     "https://docs.google.com/spreadsheets/d/1GTcdEXoydBhbubKlh2sDS29TyL8_h14CO8NbKbYMDb8/edit#gid=0")
-
-            menu.create_window(data_badges, read_in_file("token_laplateforme"))
-    else:
-        google_auth_script.authenticate()
-        token_google_id = read_in_file("token_google_id")
-        if token_google_id != -1:
-            get_laplateforme_token_result = get_laplateforme_token(
-                read_in_file("token_google_id"))
-            if get_laplateforme_token_result:
-                # print('3')
-
-                import menu
-                data_badges = get_data_badges()
-                # data_badges = menu.lire_fichier_gsheets(
-                #     "https://docs.google.com/spreadsheets/d/1GTcdEXoydBhbubKlh2sDS29TyL8_h14CO8NbKbYMDb8/edit#gid=0")
-                # print(data_badges)
-
-                menu.create_window(
-                    data_badges, read_in_file("token_laplateforme"))
+            # for data in data_badges:
+            menu.create_window(
+                data_badges, read_in_file("token_laplateforme"))
 
 
 if __name__ == "__main__":

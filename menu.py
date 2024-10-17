@@ -21,42 +21,34 @@ students_presents = []
 
 
 def get_student_by_badge(data_listing, card):
+    print("start get student by badge")
     student = ""
-    # print("----------- DATA LISTING ------------")
-    # for ligne in data_listing:
-    #     print("\t".join(map(str, ligne)))
-    # print("----------- FIN DATA LISTING ------------")
-    # print("OK")
-    # print(data_listing[1])
     if data_listing:
+        print("len data listing")
         print(len(data_listing))
         index = 0
         while index < len(data_listing):
+
             row = data_listing[index]
-            badge_number = row[1]
-            if (badge_number):
-                if int(badge_number) == card:
-                    try:
-                        badge_number = int(badge_number)
-                        if badge_number == card:
-                            student = row[0]
-                            break
-                    except ValueError:
-                        pass
+            if data_listing[index][1]:
+                try:
+                    badge_number = int(data_listing[index][1])
+                    if badge_number == card:
+                        student = row[0]
+                        break
+                except ValueError:
+                    pass
             index += 1
 
     return student
 
 
 def lire_fichier_gsheets(url):
-    # Définir les scopes et les informations d'identification
     scope = ['https://spreadsheets.google.com/feeds',
              'https://www.googleapis.com/auth/drive']
-    # Remplacez 'credentials.json' par votre fichier JSON de clés
     credentials = ServiceAccountCredentials.from_json_keyfile_name(
         'credentials.json', scope)
 
-    # Authentification et ouverture de la feuille de calcul
     gc = gspread.authorize(credentials)
     try:
         # Ouvrir la feuille de calcul à partir de l'URL
@@ -65,8 +57,6 @@ def lire_fichier_gsheets(url):
         worksheet = workbook.sheet1
         # Récupérer les données de la feuille de calcul
         data = worksheet.get_all_values()
-        # print("GSHEET === ")
-        # print(data)
         return data
     except gspread.exceptions.APIError as e:
         print(
@@ -78,53 +68,36 @@ def start_rfid_thread(part2_frame, canvas, part3_frame, data_badges):
     print("Thread starts")
     thread = threading.Thread(target=read_rfid, args=(
         part2_frame, canvas, part3_frame, data_badges))
-    # Le thread s'exécutera en arrière-plan et se terminera lorsque l'application principale se fermera
     thread.daemon = True
     thread.start()
 
 
 def read_rfid(part2_frame, canvas, part3_frame, data_badges):
     print("Lecture en cours")
+
     while True:
-
-        # print("READ RFID")
         card_id = 0
-
-        # Recherche des lecteurs de cartes
         card_readers = readers()
-
         if len(card_readers) == 0:
             return
-
         reader = card_readers[0]
-
         try:
             connection = reader.createConnection()
             connection.connect()
-
-            # Lire le numéro de série de la carte RFID
             READ_SERIAL = [0xFF, 0xCA, 0x00, 0x00, 0x00]
             response, sw1, sw2 = connection.transmit(READ_SERIAL)
             if sw1 == 0x90 and sw2 == 0x00:
-                # Inverser l'ordre des octets dans la variable response
                 response_reversed = response[::-1]
-                # print(response_reversed)
                 card_id = int(toHexString(
                     response_reversed).replace(" ", ""), 16)
-                # print("Card Id ")
-                # print(card_id)
-                # print("fin card id")
+                print("Card Id ")
+                print(card_id)
+                print("fin card id")
                 student_email = get_student_by_badge(data_badges, card_id)
-                # print("Email student " + student_email)
+                print("Email student " + student_email)
                 if student_email:
                     on_email_click(student_email, part2_frame,
                                    part3_frame, canvas, -1)  # -1, pour dire que la fonction est appelée via la lecture de carte. De ce fait, l'étudiant ne sera pas rebasculé de la liste de présents à la liste des absents
-                    # student_by_badge = get_student_by_badge(data_badges, card_id)
-
-                    # if student_by_badge:
-                    #     if student_by_badge in students:
-                    #         update_students_valid(
-                    #             frame_zone2, frame_zone3, student_by_badge, students, students_valid)
 
         except Exception as e:
             pass
