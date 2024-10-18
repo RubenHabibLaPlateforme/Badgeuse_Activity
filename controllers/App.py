@@ -3,24 +3,24 @@ import tkinter as tk
 import requests
 from tkinter import messagebox
 import customtkinter as ctk
-from controllers.RfidReader import RfidReader 
+from controllers.RfidReader import RfidReader
 from controllers.Tools import Tools
 from controllers.ApiPlateforme import ApiPlateforme
 
 
-class App : 
+class App:
 
     students_list = []
     students_presents = []
     units = []
     rfiReader = RfidReader()
-    tokenPlateforme = '' 
-    part2_frame = ""  
-    part3_frame = ""  
+    tokenPlateforme = ''
+    part2_frame = ""
+    part3_frame = ""
     list_student_widgets = {}
     present_students_widgets = {}
 
-    def create_window(self, data_badges, token, userInfos):        
+    def create_window(self, data_badges, token, userInfos):
 
         print("DEBUT CREATE WINDOW")
 
@@ -40,11 +40,11 @@ class App :
             logo = Tools.loadLogo()
             # Mettre l'application au premier plan + maximized
             root.state('zoomed')
-            root.attributes("-topmost", True)  
-            root.after(0, root.attributes, "-topmost", False)  # Enlève l'attribut après le lancement
+            root.attributes("-topmost", True)
+            # Enlève l'attribut après le lancement
+            root.after(0, root.attributes, "-topmost", False)
 
             # img = Image.open("logo_laplateforme.jpg")
-            
 
             root.protocol("WM_DELETE_WINDOW", lambda: self.on_closing(root))
 
@@ -58,7 +58,7 @@ class App :
             part1_height = int(screen_height * 0.1)
             part1 = tk.Frame(
                 root,
-                bg='#2c3e50', 
+                bg='#2c3e50',
                 width=screen_width,
                 height=part1_height
             )
@@ -71,9 +71,9 @@ class App :
             label_accompagnateur = ctk.CTkLabel(
                 part1,
                 text="Accompagnateur : " + userInfos.user_name,
-                padx=10, 
-                fg_color='#2c3e50', 
-                text_color='white', 
+                padx=10,
+                fg_color='#2c3e50',
+                text_color='white',
                 font=("Roboto", 14)
             )
             label_accompagnateur.pack(side=tk.LEFT)
@@ -81,33 +81,33 @@ class App :
             # Case à cocher "obligatoire"
             is_mandatory_var = tk.BooleanVar(value=True)
             mandatory_checkbox = ctk.CTkCheckBox(
-                part1, 
-                text="Obligatoire",  
-                variable=is_mandatory_var,  
-                fg_color='#747d8c', 
+                part1,
+                text="Obligatoire",
+                variable=is_mandatory_var,
+                fg_color='#747d8c',
                 hover_color='#009432',
-                border_color='grey',  
-                border_width=1,  
-                text_color='white',  
+                border_color='grey',
+                border_width=1,
+                text_color='white',
             )
 
             mandatory_checkbox.pack(side=tk.LEFT, padx=30)
 
             # Menu déroulant pour les options
             options = ["Activite", "Consultation technique", "How to", "Kick-off", "Soutenance",
-                    "Suivi de projet", "Coaching", "Anglais", "Relation\nEntreprises", "Autre"]
-            
+                       "Suivi de projet", "Coaching", "Anglais", "Relation\nEntreprises", "Autre"]
+
             # Pré-sélection de "Activité"
             option_var = tk.StringVar(value=options[0])
 
             option_menu = ctk.CTkOptionMenu(part1,
-                values=options,
-                variable=option_var,  
-                fg_color="#747d8c",   
-                text_color="white",   
-                button_color="#57606f",  
-                button_hover_color="#2f3542"
-            )  
+                                            values=options,
+                                            variable=option_var,
+                                            fg_color="#747d8c",
+                                            text_color="white",
+                                            button_color="#57606f",
+                                            button_hover_color="#2f3542"
+                                            )
 
             # Positionner le menu dans la navbar
             option_menu.pack(side=tk.LEFT, padx=10, pady=10)
@@ -115,51 +115,51 @@ class App :
 
             # Menu déroulant pour les units
             unit_var = tk.StringVar(value=units_code[0])
-            
+
             unit_menu = ctk.CTkOptionMenu(
-                part1, 
-                variable=unit_var, 
-                values=units_code,  
-                fg_color="#aaa69d",  
-                text_color="white", 
-                button_color="#84817a", 
-                button_hover_color="#84817a" 
+                part1,
+                variable=unit_var,
+                values=units_code,
+                fg_color="#aaa69d",
+                text_color="white",
+                button_color="#84817a",
+                button_hover_color="#84817a"
             )
-            
+
             unit_menu.pack(side=tk.LEFT, padx=10, pady=10)
 
             unit_menu.pack(side=tk.LEFT, padx=10)
-            
+
             btn_filtre = ctk.CTkButton(
-                part1, 
+                part1,
                 fg_color="#3498db",
                 hover_color="#2980b9",
-                text="Filtrer", 
-                command=lambda: 
+                text="Filtrer",
+                command=lambda:
                     self.on_filter_click(
                         unit_var.get(),
                         canvas
                     )
             )
-            
+
             btn_filtre.pack(side=tk.LEFT, padx=10)
 
             btn_valider = ctk.CTkButton(
-                part1, 
+                part1,
                 fg_color="#44bd32",
                 hover_color="#009432",
-                text="Valider", 
+                text="Valider",
                 text_color="white",
-                command=lambda: 
+                command=lambda:
                     self.on_validate_click(
                         unit_var.get(),
-                        int(is_mandatory_var.get()), 
-                        option_var.get(), 
+                        int(is_mandatory_var.get()),
+                        option_var.get(),
                         canvas,
                         userInfos
                     )
             )
-            
+
             btn_valider.pack(side=tk.LEFT, padx=10, pady=20)
 
             # Partie 2 : 50% de la largeur, 90% de la hauteur avec barre de défilement
@@ -168,26 +168,23 @@ class App :
 
             part2_container = ctk.CTkFrame(
                 root,
-                width=part2_width, 
-                height=part2_height, 
+                width=part2_width,
+                height=part2_height,
                 fg_color="#bdc3c7",
             )
             part2_container.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
 
-           
-
-
             canvas = tk.Canvas(
-                part2_container, 
+                part2_container,
                 bg='#bdc3c7',
-                width=part2_width, 
+                width=part2_width,
                 height=part2_height
             )
 
             scrollbar = ctk.CTkScrollbar(
                 part2_container, orientation="vertical", command=canvas.yview
             )
-            
+
             scrollbar.pack(side="right", fill="y")
 
             self.part2_frame = ctk.CTkFrame(canvas, fg_color='#bdc3c7')
@@ -197,28 +194,28 @@ class App :
                 canvas.configure(scrollregion=canvas.bbox("all"))
 
             def onMouseWheel(event, canvas):
-            # Permet de faire défiler la vue en fonction de la molette
+                # Permet de faire défiler la vue en fonction de la molette
                 canvas.yview_scroll(int(-1*(event.delta/120)), "units")
-     
 
             self.part2_frame.bind("<Configure>", update_scrollregion)
 
             canvas.configure(yscrollcommand=scrollbar.set)
-            canvas.pack(side="left", fill="both", expand=True)  
-            canvas.bind_all("<MouseWheel>", lambda event: onMouseWheel(event, canvas))
+            canvas.pack(side="left", fill="both", expand=True)
+            canvas.bind_all(
+                "<MouseWheel>", lambda event: onMouseWheel(event, canvas))
 
             # Partie 3 : 50% de la largeur, 90% de la hauteur
             part3_width = int(screen_width * 0.5)
             part3_height = int(screen_height * 0.9)
             self.part3_frame = tk.Frame(root, bg='#7f8c8d', width=part3_width,
-                            height=part3_height, bd=0, relief=tk.GROOVE, pady=10, padx=10)
+                                        height=part3_height, bd=0, relief=tk.GROOVE, pady=10, padx=10)
             self.part3_frame.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True)
 
             # Empêcher part3 de s'adapter à la taille de ses enfants
             self.part3_frame.pack_propagate(False)
 
-            self.rfiReader.start_rfid_thread(self, self.part2_frame, canvas, self.part3_frame, data_badges, self.on_email_click)
-            
+            self.rfiReader.start_rfid_thread(
+                self, self.part2_frame, canvas, self.part3_frame, data_badges, self.on_email_click)
 
             # Lets goo
             root.mainloop()
@@ -234,8 +231,8 @@ class App :
                     Tools.read_in_file("temp/token_google_id")
                 )
 
-                self.create_window(data_badges, Tools.read_in_file("temp/token_laplateforme"), userInfos)
-
+                self.create_window(data_badges, Tools.read_in_file(
+                    "temp/token_laplateforme"), userInfos)
 
     def get_student_by_badge(data_listing, card):
 
@@ -268,8 +265,7 @@ class App :
                 index += 1
 
         return student
-    
-    
+
     def get_units(self, url, token):
 
         print("-------------")
@@ -282,20 +278,20 @@ class App :
             response = requests.get(url, headers=headers)
 
             while response.status_code == 402:
-                ApiPlateforme.refresh_token()
+                ApiPlateforme.refreshTokenPlateforme()
                 headers = {
-                    "token": Tools.read_in_file("token_laplateforme")
+                    "token": Tools.read_in_file("../temp/token_laplateforme")
                 }
                 response = requests.request("POST", url, headers=headers)
 
             if response.status_code == 200:
-                
+
                 response_data = response.json()
 
                 units = [{"id": entry["unit_id"], "name": entry["unit_code"]}
-                        for entry in response_data]
-                
-                return units            
+                         for entry in response_data]
+
+                return units
 
             else:
                 print("La requête a échoué avec le statut", response.status_code)
@@ -305,10 +301,9 @@ class App :
             print("Une erreur est survenue lors de la requête :", e)
 
         return None
-    
-    
+
     def display_part_2(self,  canvas):
-    # Vider la partie 2 de la fenêtre
+        # Vider la partie 2 de la fenêtre
         for widget in self.part2_frame.winfo_children():
             widget.destroy()
 
@@ -321,17 +316,18 @@ class App :
         # Ajouter les student_email à la partie 2
         for entry in self.students_list:
             # email_frame = tk.Frame(self.part2_frame, bg="white", pady=5)
-            email_frame = ctk.CTkFrame(self.part2_frame, fg_color='white' )
-            label = ctk.CTkLabel(email_frame, text=entry, fg_color='white', text_color='black')
+            email_frame = ctk.CTkFrame(self.part2_frame, fg_color='white')
+            label = ctk.CTkLabel(email_frame, text=entry,
+                                 fg_color='white', text_color='black')
             label.pack(side=tk.LEFT, pady=5, padx=10)
 
             # Créer une fonction qui capture la valeur actuelle d'entry
             def create_button(email):
                 return ctk.CTkButton(
-                    email_frame, 
+                    email_frame,
                     fg_color="#6ab04c",
                     hover_color="#44bd32",
-                    text="Ajouter", 
+                    text="Ajouter",
                     text_color="white",
                     command=lambda: self.on_email_click(email)
                 )
@@ -352,45 +348,34 @@ class App :
         canvas.update_idletasks()
         canvas.config(scrollregion=canvas.bbox("all"))
 
-
-
-
-    
-
- 
-         
-    
-    def on_email_click(self, email, byCard = False):
+    def on_email_click(self, email, byCard=False):
         if email in self.students_presents:  # Si l'étudiant est déjà dans la liste
 
-            if not byCard :
-                self.students_presents.remove(email) 
+            if not byCard:
+                self.students_presents.remove(email)
                 if email in self.present_students_widgets:
-                    
+
                     self.present_students_widgets[email].destroy()
                     del self.present_students_widgets[email]
-                    
-                
+
                     # Créer un widget pour l'étudiant dans Partie 2
                     self.students_list.append(email)
                     self.add_student_widget_part2(email)
         else:
             self.students_presents.append(email)
-            
+
             # Créer un widget pour l'étudiant dans Partie 3
             self.add_student_widget_part3(email)
-            
-           
-
 
     def on_filter_click(self, selected_option,  canvas):
-        
+
         selected_id = None
         for unit in self.units:
             if unit["name"] == selected_option:
                 selected_id = unit["id"]
-                self.students_list = ApiPlateforme.feed_students_list(selected_id)
-                self.display_part_2( canvas)
+                self.students_list = ApiPlateforme.feed_students_list(
+                    selected_id)
+                self.display_part_2(canvas)
                 break
 
         if selected_id is not None:
@@ -399,17 +384,14 @@ class App :
         else:
             print(f"Aucun ID trouvé pour l'unité: {selected_option}")
 
-
     def on_validate_click(self, selected_option_unit, is_mandatory, selected_option_activity,  canvas, userInfos):
-        
 
         print(is_mandatory)
 
-        if selected_option_activity == "Activite" : 
+        if selected_option_activity == "Activite":
             messagebox.showinfo(
-                    "Attention", "Veuillez sélectionner  une activité")
+                "Attention", "Veuillez sélectionner  une activité")
             return
-
 
         confirmation = messagebox.askyesno(
             "Confirmation", "Êtes-vous sûr de vouloir valider votre appel ?")
@@ -429,7 +411,8 @@ class App :
         print(f"Nom de l'activité: {selected_option_activity}")
         print(f"Nom du mail: {userInfos.user_email}")
 
-        Tools.csv_save(selected_option_unit, selected_option_activity, self.students_presents)
+        Tools.csv_save(selected_option_unit,
+                       selected_option_activity, self.students_presents)
 
         url = "https://api.laplateforme.io/activity"
 
@@ -450,6 +433,14 @@ class App :
         print("----------------")
 
         response = requests.request("POST", url, headers=headers, data=payload)
+
+        while response.status_code == 402:
+            ApiPlateforme.refreshTokenPlateforme()
+            headers = {
+                "token": Tools.read_in_file("temp/token_laplateforme")
+            }
+            response = requests.request(
+                "POST", url, headers=headers, data=payload)
 
         try:
             response_data = response.json()
@@ -487,38 +478,40 @@ class App :
             )
 
     def add_student_widget_part2(self, email):
-        
+
         student_frame = ctk.CTkFrame(self.part2_frame, fg_color='white')
-        student_label = ctk.CTkLabel(student_frame, text=email, fg_color='white', text_color='black' )
+        student_label = ctk.CTkLabel(
+            student_frame, text=email, fg_color='white', text_color='black')
         student_label.pack(side="left", padx=10, pady=5)
 
-        addButton = ctk.CTkButton(student_frame, text="Ajouter", text_color="white",command=lambda: self.on_email_click(email),fg_color="#6ab04c", hover_color="#44bd32")
+        addButton = ctk.CTkButton(student_frame, text="Ajouter", text_color="white", command=lambda: self.on_email_click(
+            email), fg_color="#6ab04c", hover_color="#44bd32")
         addButton.pack(side="right", padx=10, pady=5)
 
         student_frame.pack(fill="x", padx=0, pady=5)
-        
+
         # Sauvegarder la référence du widget pour suppression future
         self.list_student_widgets[email] = student_frame
-    
+
     def add_student_widget_part3(self, email):
         # Création d'un label et d'un bouton pour retirer l'étudiant
         student_frame = ctk.CTkFrame(self.part3_frame, fg_color='white')
-        student_label = ctk.CTkLabel(student_frame, text=email, fg_color='white', text_color='black')
-        student_label.pack(side="left", padx=10, pady=5)        
+        student_label = ctk.CTkLabel(
+            student_frame, text=email, fg_color='white', text_color='black')
+        student_label.pack(side="left", padx=10, pady=5)
 
         remove_button = ctk.CTkButton(
-                student_frame, 
-                fg_color="#eb4d4b",
-                hover_color="#ff7979",
-                text="Retirer", 
-                text_color="white",
-                command=lambda 
-                : self.on_email_click(email)
-            )
+            student_frame,
+            fg_color="#eb4d4b",
+            hover_color="#ff7979",
+            text="Retirer",
+            text_color="white",
+            command=lambda: self.on_email_click(email)
+        )
         remove_button.pack(side="right", padx=10, pady=5)
 
         student_frame.pack(fill="x", padx=10, pady=5)
-        
+
         # Sauvegarder la référence du widget pour suppression future
         self.present_students_widgets[email] = student_frame
 
@@ -527,9 +520,8 @@ class App :
     def remove_student_widget_part2(self, email):
         if email in self.list_student_widgets:
             widget = self.list_student_widgets[email]
-            widget.destroy()  
-            del self.list_student_widgets[email] 
-
+            widget.destroy()
+            del self.list_student_widgets[email]
 
     def remove_all_student_widget_part3(self):
         # Créer une liste des emails à supprimer
@@ -538,17 +530,12 @@ class App :
         # Itérer sur la liste des emails
         for email in emails_to_remove:
             widget = self.present_students_widgets[email]
-            widget.destroy() 
+            widget.destroy()
             del self.present_students_widgets[email]
-
-    
 
     def on_closing(self, root):
         os.remove("temp/auth_token_laplateforme")
         os.remove("temp/token_laplateforme")
         os.remove("temp/token.json")
         os.remove("temp/token_google_id")
-        root.destroy()         
-            
-
-        
+        root.destroy()
