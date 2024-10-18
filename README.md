@@ -1,19 +1,16 @@
-# Badgeuse_Activity
+# Ma Badgeuse 
 
-Version Python : **3.10.0**
+## Get started
+- Installer les dépendances situées dans le fichier **requirements.txt**
+```python
+    pip install -r requirements.txt 
+```
+- Build le **.exe** ( A fixer )
+```python
+   pyinstaller --onefile --windowed main.py 
+```
+-  Lancer le serveur en utilisant la commande `python main.py`
+  
 
-Installer les dépendances nécessaires
 
-Lancer le fichier main.py
-
-Sélectionner le type d'activité
-
-Sélectionner le groupe pour lequel il faut faire l'appel
-
-Brancher la badgeuse
-
-Scanner les badges
-
-Cliquer sur valider une fois l'appel terminé
-
-Fermer le programme
+## Git 
