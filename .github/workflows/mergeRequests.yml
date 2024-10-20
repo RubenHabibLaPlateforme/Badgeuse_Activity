@@ -1,0 +1,33 @@
+name: Notify Merge on main to Google Chat
+
+on:
+  pull_request:
+    types: [closed]  
+    branches:
+      - main
+
+jobs:
+  notify_merge_on_main_to_google_chat:
+    if: ${{ github.event.pull_request.merged == true }}  
+    runs-on: ubuntu-latest
+    steps:
+      - name: Notify Google Chat
+        uses: SimonScholz/google-chat-action@main
+        with:
+          webhookUrl: ${{ secrets.GOOGLE_CHAT_URL }}
+          title: La Badgeuse a été mise à jour ! 🎉🎉 
+          subtitle: |
+            Une nouvelle pull request a été fusionnée dans la branche principale.
+          additionalSections: |
+            [
+              {
+                "header": "Détails de la fusion",
+                "collapsible": true,
+                "widgets": [
+                  { "decoratedText": { "text": "- Titre de la PR : ${{ github.event.pull_request.title }}" } },
+                  { "decoratedText": { "text": "- Auteur de la PR : ${{ github.event.pull_request.user.login }}" } },  
+                  { "decoratedText": { "text": "- Fusionné par : ${{ github.actor }}" } }, 
+                  { "decoratedText": { "text": "- URL de la PR : [Voir la PR](${{ github.event.pull_request.html_url }})" } }
+                ]
+              }
+            ]
