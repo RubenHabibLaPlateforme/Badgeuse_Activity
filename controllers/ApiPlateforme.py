@@ -52,14 +52,13 @@ class ApiPlateforme:
             if response.status_code == 200:
                 print("Réponse reçue :")
                 response_data = response.json()
+                response_data.sort(key=lambda x: x["student_email"])
                 print(response_data)
                 # data_badges = [entry['student_email'] for entry in response_data]
                 # print("Students List updated:", students_list)
-                data_badges = []
-                for item in response_data:
-                    ligne = [item["student_email"], item["student_badge"]]
-                    data_badges.append(ligne)
-                return data_badges
+
+                return [[item["student_email"], item["student_badge"]] for item in response_data]
+
             else:
                 print("La requête a échoué avec le statut", response.status_code)
                 print(response.text)
@@ -110,6 +109,7 @@ class ApiPlateforme:
             if response.status_code == 200:
                 print("Réponse reçue :")
                 response_data = response.json()
+                response_data.sort(key=lambda x: x["student_email"])
                 students_list = [entry["student_email"] for entry in response_data]
                 return students_list
             else:
