@@ -39,9 +39,9 @@ class ApiPlateforme:
                     notification.notify(
                                 title = "Erreur dans la réponse de API plateforme",
                                 message = response_data["error"],
-                                timeout = 6,
+                                timeout = 5,
                                 app_name="Badgeuse la plateforme", 
-                                app_icon=Tools.get_resource_path("assets/logo_laplateforme.jpg"),
+                                app_icon=Tools.get_resource_path("assets/logo_laplateforme_icon.ico"),
                                 
                     )
                     
@@ -50,9 +50,9 @@ class ApiPlateforme:
                 notification.notify(
                     title = "La requête a échoué avec le statut",
                     message=str(response.text)+": Status " + str(response.status_code),
-                    timeout = 6,
+                    timeout = 5,
                     app_name="Badgeuse la plateforme", 
-                    app_icon=Tools.get_resource_path("assets/logo_laplateforme.jpg"),
+                    app_icon=Tools.get_resource_path("assets/logo_laplateforme_icon.ico"),
                                 
                 )
                 
@@ -62,9 +62,9 @@ class ApiPlateforme:
             notification.notify(
                 title = "Une erreur est survenue lors de la requête de récupération du token",
                 message = e,
-                timeout = 6,
+                timeout = 5,
                 app_name="Badgeuse la plateforme", 
-                app_icon=Tools.get_resource_path("assets/logo_laplateforme.jpg"),
+                app_icon=Tools.get_resource_path("assets/logo_laplateforme_icon.ico"),
                             
             )
         return 1
@@ -92,9 +92,9 @@ class ApiPlateforme:
                 notification.notify(
                     title = " ⚠️La requête a échoué avec le statut",
                     message=str(response.text)+": Status " + str(response.status_code),
-                    timeout = 6,
+                    timeout = 5,
                     app_name="Badgeuse la plateforme", 
-                    app_icon=Tools.get_resource_path("assets/logo_laplateforme.jpg"),
+                    app_icon=Tools.get_resource_path("assets/logo_laplateforme_icon.ico"),
                                 
                 )
                 
@@ -103,9 +103,9 @@ class ApiPlateforme:
             notification.notify(
                 title = "⚠️ Une erreur est survenue lors de la requête de get_data_badges",
                 message = e,
-                timeout = 6,
+                timeout = 5,
                 app_name="Badgeuse la plateforme", 
-                app_icon=Tools.get_resource_path("assets/logo_laplateforme.jpg"),
+                app_icon=Tools.get_resource_path("assets/logo_laplateforme_icon.ico"),
                             
             )
 
@@ -138,7 +138,7 @@ class ApiPlateforme:
                 message= "Informations sur l'étudiant vide .",
                 timeout = 10 ,
                 app_name="Badgeuse la plateforme", 
-                app_icon=Tools.get_resource_path("assets/logo_laplateforme.jpg"),                               
+                app_icon=Tools.get_resource_path("assets/logo_laplateforme_icon.ico"),                               
             )
         
 
@@ -171,9 +171,9 @@ class ApiPlateforme:
                 notification.notify(
                     title = " ⚠️La requête a échoué avec le statut",
                     message=str(response.text)+": Status " + str(response.status_code),
-                    timeout = 6,
+                    timeout = 5,
                     app_name="Badgeuse la plateforme", 
-                    app_icon=Tools.get_resource_path("assets/logo_laplateforme.jpg"),
+                    app_icon=Tools.get_resource_path("assets/logo_laplateforme_icon.ico"),
                                 
                 )
         except requests.exceptions.RequestException as e:
@@ -181,9 +181,9 @@ class ApiPlateforme:
             notification.notify(
                 title = " ⚠️Une erreur est survenue lors dela requête :",
                 message= e,
-                timeout = 6,
+                timeout = 5,
                 app_name="Badgeuse la plateforme", 
-                app_icon=Tools.get_resource_path("assets/logo_laplateforme.jpg"),
+                app_icon=Tools.get_resource_path("assets/logo_laplateforme_icon.ico"),
                                 
             )
 

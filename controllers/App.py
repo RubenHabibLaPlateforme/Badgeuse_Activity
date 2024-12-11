@@ -1,6 +1,8 @@
 import os
 import tkinter as tk
 import requests
+from PIL import Image, ImageTk
+import customtkinter as ctk
 from tkinter import messagebox
 import customtkinter as ctk
 from controllers.RfidReader import RfidReader
@@ -38,17 +40,15 @@ class App:
             root.title("Gestion des Unités")
             root.configure(bg="#f0f0f0")
             logo = Tools.loadLogo()
+            
             # Mettre l'application au premier plan + maximized
             root.state('zoomed')
             root.attributes("-topmost", True)
+            
             # Enlève l'attribut après le lancement
-            root.after(0, root.attributes, "-topmost", False)
-
-            # img = Image.open("logo_laplateforme.jpg")
+            root.after(0, root.attributes, "-topmost", False)            
 
             root.protocol("WM_DELETE_WINDOW", lambda: self.on_closing(root))
-
-            # tk_img = ImageTk.PhotoImage(img) a remettre
 
             # Obtenir la taille de l'écran
             screen_width = root.winfo_screenwidth()
@@ -278,9 +278,9 @@ class App:
         notification.notify(
                 title = "Liste des étudiants",
                 message = "Chargée avec succès !",
-                timeout = 6,
+                timeout = 5,
                 app_name="Badgeuse la plateforme", 
-                app_icon=Tools.get_resource_path("assets/logo_laplateforme.jpg"),
+                app_icon=Tools.get_resource_path("assets/logo_laplateforme_icon.ico"),
         )
 
         try:
@@ -306,9 +306,9 @@ class App:
                 notification.notify(
                     title = " ⚠️La requête a échoué avec le statut",
                     message=str(response.text)+": Status " + str(response.status_code),
-                    timeout = 6,
+                    timeout = 5,
                     app_name="Badgeuse la plateforme", 
-                    app_icon=Tools.get_resource_path("assets/logo_laplateforme.jpg"),
+                    app_icon=Tools.get_resource_path("assets/logo_laplateforme_icon.ico"),
                                 
                 )
 
@@ -316,9 +316,9 @@ class App:
             notification.notify(
                 title = " ⚠️Une erreur est survenue lors dela requête :",
                 message= e,
-                timeout = 6,
+                timeout = 5,
                 app_name="Badgeuse la plateforme", 
-                app_icon=Tools.get_resource_path("assets/logo_laplateforme.jpg"),
+                app_icon=Tools.get_resource_path("assets/logo_laplateforme_icon.ico"),
                                 
             )
 
@@ -447,9 +447,9 @@ class App:
         notification.notify(
             title = "Le PDF récapitulatif a été généré",
             message= 'Avec succès',
-            timeout = 6,
+            timeout = 5,
             app_name="Badgeuse la plateforme", 
-            app_icon=Tools.get_resource_path("assets/logo_laplateforme.jpg"),
+            app_icon=Tools.get_resource_path("assets/logo_laplateforme_icon.ico"),
                                 
         )
 
@@ -555,6 +555,8 @@ class App:
         self.present_students_widgets[email] = student_frame
 
         self.remove_student_widget_part2(email)
+
+   
 
     def remove_student_widget_part2(self, email):
         if email in self.list_student_widgets:

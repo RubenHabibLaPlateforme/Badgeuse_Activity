@@ -5,13 +5,16 @@
 ```python
     pip install -r requirements.txt 
 ```
-- Build le **.exe** ( A fixer )
+
+- Build le **.exe** (avec terminal output)
 ```python
-   pyinstaller --onefile --windowed main.py 
+   pyinstaller --onefile --add-data "config/credentials.json;config" --add-data "config/client_secrets.json;config" --add-data "assets/logo_laplateforme_icon.ico;assets" --add-data "assets/logo_laplateforme.jpg;assets" --hidden-import plyer.platforms.win.notification main.py
 ```
-- Build le **.exe** ( A fixer )
+- Build le **.exe**
 ```python
-   pyinstaller --onefile --add-data "config/credentials.json;config" main.py
+   pyinstaller --onefile --add-data "config/credentials.json;config" --noconsole --add-data "config/client_secrets.json;config" --add-data "assets/logo_laplateforme_icon.ico;assets" --add-data "assets/logo_laplateforme.jpg;assets"  --hidden-import plyer.platforms.win.notification main.py
+
+
 ```
 -  Lancer le serveur en utilisant la commande `python main.py`
   

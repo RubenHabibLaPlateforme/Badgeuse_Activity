@@ -11,7 +11,7 @@ from plyer import notification
 
 class GoogleAuth:
     
-
+    
     userEmail= ''
     userName= ''
 
@@ -34,13 +34,7 @@ class GoogleAuth:
         
         creds = None
         
-        notification.notify(
-            title = "Authentification Google",
-            message = "Veuillez vous rendre sur votre navigateur",
-            timeout = 6,
-            app_name="Badgeuse la plateforme", 
-            app_icon=Tools.get_resource_path("assets/logo_laplateforme_icon.ico"),                
-        )
+        
 
         # Vérifiez si les informations d'identification existent déjà
         if os.path.exists('temp/token.json'):
@@ -48,12 +42,21 @@ class GoogleAuth:
 
         # Si aucune information d'identification valide n'existe, effectuez le flux OAuth 2.0
         if not creds or not creds.valid:
+            
+            notification.notify(
+                title = "Authentification Google",
+                message = "Veuillez vous rendre sur votre navigateur",
+                timeout = 5,
+                app_name="Badgeuse la plateforme", 
+                app_icon=Tools.get_resource_path("assets/logo_laplateforme_icon.ico"),                
+            )
             if creds and creds.expired and creds.refresh_token:
                 creds.refresh(google.auth.transport.requests.Request())
             else:
                 flow = InstalledAppFlow.from_client_secrets_file(
                     self.CLIENT_SECRETS_FILE, self.SCOPES)
-                creds = flow.run_local_server(port=8080)  # Spécifiez le port ici
+                creds = flow.run_local_server(port=8080) 
+                
 
             if not os.path.exists('temp'):
                 os.makedirs('temp')    
@@ -70,13 +73,6 @@ class GoogleAuth:
         self.userName = user_info['email']
         self.userEmail = user_info['name']
         Tools.write_in_file("temp/token_google_id", creds.id_token)        
-        
-        notification.notify(
-            title = "Authentification Google",
-            message = "Authentifié avec succès",
-            timeout = 6,
-            app_name="Badgeuse la plateforme", 
-            app_icon=Tools.get_resource_path("assets/logo_laplateforme_icon.ico"),                
-        )
+       
 
         return creds    

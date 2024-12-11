@@ -5,6 +5,7 @@ import sys
 from PIL import Image, ImageTk
 import csv
 
+
 class Tools : 
     
     @staticmethod
@@ -77,8 +78,9 @@ class Tools :
         original_image = Image.open(image_path)
         
         # Redimensionner l'image (facultatif)
-        return ImageTk.PhotoImage(original_image.resize((40, 40)))  # Ajuster la taille selon vos besoins    
-
+        return ImageTk.PhotoImage(original_image.resize((40, 40))) 
+    
+    
     def csv_save(selected_option_unit, selected_option_activity, students_presents):
         
         os.makedirs("logs", exist_ok=True)
