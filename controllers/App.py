@@ -6,6 +6,7 @@ import customtkinter as ctk
 from controllers.RfidReader import RfidReader
 from controllers.Tools import Tools
 from controllers.ApiPlateforme import ApiPlateforme
+from plyer import notification
 
 
 class App:
@@ -21,8 +22,7 @@ class App:
     present_students_widgets = {}
 
     def create_window(self, data_badges, token, userInfos):
-
-        print("DEBUT CREATE WINDOW")
+        
 
         self.units = self.get_units(
             "https://api.laplateforme.io/unit?unit_code=&unit_id&is_active=1",
@@ -239,7 +239,8 @@ class App:
         student = ""
 
         if data_listing:
-
+            
+            
             print(len(data_listing))
 
             index = 0
@@ -273,6 +274,14 @@ class App:
         print("-------------")
 
         headers = {"token": token}
+        
+        notification.notify(
+                title = "Liste des étudiants",
+                message = "Chargée avec succès !",
+                timeout = 6,
+                app_name="Badgeuse la plateforme", 
+                app_icon=Tools.get_resource_path("assets/logo_laplateforme.jpg"),
+        )
 
         try:
             response = requests.get(url, headers=headers)
@@ -294,11 +303,24 @@ class App:
                 return units
 
             else:
-                print("La requête a échoué avec le statut", response.status_code)
-                print(response.text)
+                notification.notify(
+                    title = " ⚠️La requête a échoué avec le statut",
+                    message=str(response.text)+": Status " + str(response.status_code),
+                    timeout = 6,
+                    app_name="Badgeuse la plateforme", 
+                    app_icon=Tools.get_resource_path("assets/logo_laplateforme.jpg"),
+                                
+                )
 
         except requests.exceptions.RequestException as e:
-            print("Une erreur est survenue lors de la requête :", e)
+            notification.notify(
+                title = " ⚠️Une erreur est survenue lors dela requête :",
+                message= e,
+                timeout = 6,
+                app_name="Badgeuse la plateforme", 
+                app_icon=Tools.get_resource_path("assets/logo_laplateforme.jpg"),
+                                
+            )
 
         return None
 
@@ -379,6 +401,12 @@ class App:
                 break
 
         if selected_id is not None:
+            # notification.notify(
+            #         title = " ⚠️Une erreur est survenue lors de la requête :",
+            #         message= e,
+            #         timeout = 10
+                                
+            # )
             print(f"Nom de l'unité sélectionnée: {selected_option}")
             print(f"ID de l'unité sélectionnée: {selected_id}")
         else:
@@ -406,13 +434,24 @@ class App:
                 selected_id = unit["id"]
                 break
 
-        print(f"Students présents: {self.students_presents}")
-        print(f"ID de l'unité sélectionnée: {selected_id}")
-        print(f"Nom de l'activité: {selected_option_activity}")
-        print(f"Nom du mail: {userInfos.user_email}")
+        # print(f"Students présents: {self.students_presents}")
+        # print(f"ID de l'unité sélectionnée: {selected_id}")
+        # print(f"Nom de l'activité: {selected_option_activity}")
+        # print(f"Nom du mail: {userInfos.user_email}")
+        
+        
 
         Tools.csv_save(selected_option_unit,
                        selected_option_activity, self.students_presents)
+        
+        notification.notify(
+            title = "Le PDF récapitulatif a été généré",
+            message= 'Avec succès',
+            timeout = 6,
+            app_name="Badgeuse la plateforme", 
+            app_icon=Tools.get_resource_path("assets/logo_laplateforme.jpg"),
+                                
+        )
 
         url = "https://api.laplateforme.io/activity"
 

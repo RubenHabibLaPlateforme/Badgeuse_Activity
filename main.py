@@ -3,6 +3,7 @@ from controllers.Tools import Tools
 from controllers.ApiPlateforme import ApiPlateforme
 from controllers.App import App
 import os
+from plyer import notification
 
 def main():
 
@@ -10,6 +11,15 @@ def main():
     app = App()
     googleAuth = GoogleAuth()
     creds = googleAuth.authenticate()
+    
+    notification.notify(
+                title = "Authentification Google",
+                message = "Connecté avec succès !",
+                timeout = 7,
+                app_name="Badgeuse la plateforme", 
+                app_icon=Tools.get_resource_path("assets/logo_laplateforme.jpg"),
+                
+    )
 
     if token_google_id != -1:
         # A FINIR BOUCLE !!

@@ -1,10 +1,16 @@
 
 from datetime import datetime
 import os
+import sys
 from PIL import Image, ImageTk
 import csv
 
 class Tools : 
+    
+    @staticmethod
+    def get_resource_path(relative_path):
+            base_path = getattr(sys, '_MEIPASS', os.path.abspath("."))
+            return os.path.join(base_path, relative_path) 
 
     @staticmethod
     def write_in_file(nom_fichier, texte):
@@ -59,12 +65,15 @@ class Tools :
         if result == "":
             result = "&present_students[]=''"
 
-        return result  
-      
+        return result 
+        
     @staticmethod
     def loadLogo():
+        def get_resource_path(relative_path):
+            base_path = getattr(sys, '_MEIPASS', os.path.abspath("."))
+            return os.path.join(base_path, relative_path)  
         # Remplace 'path_to_image.png' par le chemin de ton image
-        image_path = "assets/logo_laplateforme.jpg"
+        image_path = get_resource_path("assets/logo_laplateforme.jpg")
         original_image = Image.open(image_path)
         
         # Redimensionner l'image (facultatif)

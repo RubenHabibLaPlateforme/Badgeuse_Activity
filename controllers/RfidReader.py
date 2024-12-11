@@ -7,7 +7,7 @@ from smartcard.util import toHexString
 class RfidReader:
     
     def start_rfid_thread(self,appInstance,part2_frame, canvas, part3_frame, data_badges, callback):
-
+        print('démarrage du processus de lecteur de carte');
         thread = threading.Thread(target=self.read_rfid, args=(
             part2_frame, canvas, part3_frame, data_badges, appInstance, callback))
         
@@ -43,12 +43,14 @@ class RfidReader:
                     
                     card_id = int(toHexString(
                         response_reversed).replace(" ", ""), 16)
-                    
+                    print(card_id);
                     student_email = ApiPlateforme.get_student_by_badge(data_badges, card_id)
                     # print("Email student " + student_email)
                     if student_email:
                         callback(student_email, True)
                         print(student_email) ; # -1, 
+                    else: 
+                        print("L'email étudiant est vide")  
             except Exception as e:
                 pass
 

@@ -1,9 +1,11 @@
 from controllers.Tools import Tools
 import requests
 import os
+from plyer import notification
 
 
-class ApiPlateforme:
+class ApiPlateforme:   
+ 
 
     @staticmethod
     def get_laplateforme_token(token):
@@ -28,20 +30,43 @@ class ApiPlateforme:
                 response_data = response.json()
 
                 if 'error' not in response_data:
+                    print("token plateforme récup avec succès !")
                     Tools.write_in_file(
                         "temp/auth_token_laplateforme", response_data.get("authtoken"))
                     Tools.write_in_file(
                         "temp/token_laplateforme", response_data.get("token"))
                 else:
-                    print('erreur dans la réponse de API plateforme' +
-                          response_data["error"])
+                    notification.notify(
+                                title = "Erreur dans la réponse de API plateforme",
+                                message = response_data["error"],
+                                timeout = 6,
+                                app_name="Badgeuse la plateforme", 
+                                app_icon=Tools.get_resource_path("assets/logo_laplateforme.jpg"),
+                                
+                    )
+                    
                     return 0
             else:
-                print("La requête a échoué avec le statut", response.status_code)
-                print(response.text)
+                notification.notify(
+                    title = "La requête a échoué avec le statut",
+                    message=str(response.text)+": Status " + str(response.status_code),
+                    timeout = 6,
+                    app_name="Badgeuse la plateforme", 
+                    app_icon=Tools.get_resource_path("assets/logo_laplateforme.jpg"),
+                                
+                )
+                
                 return 0
         except requests.exceptions.RequestException as e:
-            print("Une erreur est survenue lors de la requête :", e)
+            
+            notification.notify(
+                title = "Une erreur est survenue lors de la requête de récupération du token",
+                message = e,
+                timeout = 6,
+                app_name="Badgeuse la plateforme", 
+                app_icon=Tools.get_resource_path("assets/logo_laplateforme.jpg"),
+                            
+            )
         return 1
 
     @staticmethod
@@ -52,22 +77,37 @@ class ApiPlateforme:
         headers = {"token": token}
         try:
             response = requests.get(url, headers=headers)
+            
             if response.status_code == 200:
-                print("Réponse reçue :")
-                response_data = response.json()
-                print(response_data)
-                # data_badges = [entry['student_email'] for entry in response_data]
-                # print("Students List updated:", students_list)
+                
+                print("Réponse reçue get_data_badges:")
+                response_data = response.json()                
                 data_badges = []
                 for item in response_data:
+                    print(item)
                     ligne = [item["student_email"], item["student_badge"]]
                     data_badges.append(ligne)
                 return data_badges
             else:
-                print("La requête a échoué avec le statut", response.status_code)
-                print(response.text)
+                notification.notify(
+                    title = " ⚠️La requête a échoué avec le statut",
+                    message=str(response.text)+": Status " + str(response.status_code),
+                    timeout = 6,
+                    app_name="Badgeuse la plateforme", 
+                    app_icon=Tools.get_resource_path("assets/logo_laplateforme.jpg"),
+                                
+                )
+                
         except requests.exceptions.RequestException as e:
-            print("Une erreur est survenue lors de la requête :", e)
+            
+            notification.notify(
+                title = "⚠️ Une erreur est survenue lors de la requête de get_data_badges",
+                message = e,
+                timeout = 6,
+                app_name="Badgeuse la plateforme", 
+                app_icon=Tools.get_resource_path("assets/logo_laplateforme.jpg"),
+                            
+            )
 
     @staticmethod
     def get_student_by_badge(data_listing, card):
@@ -85,23 +125,32 @@ class ApiPlateforme:
                     try:
                         badge_number = int(badge_number)
                         if badge_number == card:
-                            print("TROUVE API")
                             student = row[0]
                             break
                     except ValueError:
                         pass
                 index += 1
 
-        return student
+            return student    
+        else :        
+            notification.notify(
+                title = "⚠️ Erreur",
+                message= "Informations sur l'étudiant vide .",
+                timeout = 10 ,
+                app_name="Badgeuse la plateforme", 
+                app_icon=Tools.get_resource_path("assets/logo_laplateforme.jpg"),                               
+            )
+        
 
     def feed_students_list(unit_id):
         students_list = []
 
         token = Tools.read_in_file("temp/token_laplateforme")
         url = f"https://api.laplateforme.io/unit/student?student_email=&unit_id={unit_id}"
-        print("Token pour la requête : ", token)
+        # print("Token pour la requête : ", token)
 
         headers = {"token": token}
+
         try:
             response = requests.get(url, headers=headers)
 
@@ -111,18 +160,32 @@ class ApiPlateforme:
                     "token": Tools.read_in_file("temp/token_laplateforme")
                 }
                 response = requests.get(url, headers=headers)
-                print(response.status_code)
+                
             if response.status_code == 200:
-                print("Réponse reçue :")
+                # print("feed_students_list / Réponse reçue :")
                 response_data = response.json()
                 students_list = [entry['student_email']
                                  for entry in response_data]
                 return students_list
             else:
-                print("La requête a échoué avec le statut", response.status_code)
-                print(response.text)
+                notification.notify(
+                    title = " ⚠️La requête a échoué avec le statut",
+                    message=str(response.text)+": Status " + str(response.status_code),
+                    timeout = 6,
+                    app_name="Badgeuse la plateforme", 
+                    app_icon=Tools.get_resource_path("assets/logo_laplateforme.jpg"),
+                                
+                )
         except requests.exceptions.RequestException as e:
-            print("Une erreur est survenue lors de la requête :", e)
+            
+            notification.notify(
+                title = " ⚠️Une erreur est survenue lors dela requête :",
+                message= e,
+                timeout = 6,
+                app_name="Badgeuse la plateforme", 
+                app_icon=Tools.get_resource_path("assets/logo_laplateforme.jpg"),
+                                
+            )
 
     @staticmethod
     def refreshTokenPlateforme():
