@@ -210,17 +210,39 @@ class App :
             # Partie 3 : 50% de la largeur, 90% de la hauteur
             part3_width = int(screen_width * 0.5)
             part3_height = int(screen_height * 0.9)
-            self.part3_frame = tk.Frame(root, bg='#7f8c8d', width=part3_width,
-                            height=part3_height, bd=0, relief=tk.GROOVE, pady=10, padx=10)
+            # Frame principale (contenant la scrollbar et le canvas)
+            self.part3_frame = tk.Frame(root, bg='#bdc3c7', width=part3_width,
+                                        height=part3_height, bd=0, relief=tk.GROOVE)
             self.part3_frame.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True)
-
-            # Empêcher part3 de s'adapter à la taille de ses enfants
             self.part3_frame.pack_propagate(False)
 
-            self.rfiReader.start_rfid_thread(self, self.part2_frame, canvas, self.part3_frame, data_badges, self.on_email_click)
-            
+            # Création du Canvas
+            canvas = tk.Canvas(self.part3_frame, bg='#bdc3c7', width=part3_width-20, height=part3_height)
+            canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
 
-            # Lets goo
+            # Ajout d'une Scrollbar verticale
+            scrollbar = ctk.CTkScrollbar(
+                self.part3_frame, orientation="vertical", command=canvas.yview
+            )
+            scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+
+            # Lier le Canvas à la Scrollbar
+            canvas.configure(yscrollcommand=scrollbar.set)
+
+            # Frame interne où sera ajouté le contenu
+            self.part3_inner_frame = tk.Frame(canvas, bg='#bdc3c7')
+            canvas.create_window((0, 0), window=self.part3_inner_frame, anchor="nw")
+
+            # Fonction pour adapter la hauteur du canvas à son contenu
+            def on_frame_configure(event):
+                canvas.configure(scrollregion=canvas.bbox("all"))
+
+            self.part3_inner_frame.bind("<Configure>", on_frame_configure)
+
+            # Test : Ajouter des éléments pour voir le scroll
+            # for i in range(50):
+            #     tk.Label(self.part3_inner_frame, text=f"Élément {i+1}", bg='#dfe6e9').pack(pady=5, padx=10)
+
             root.mainloop()
 
         else:
@@ -502,7 +524,7 @@ class App :
     
     def add_student_widget_part3(self, email):
         # Création d'un label et d'un bouton pour retirer l'étudiant
-        student_frame = ctk.CTkFrame(self.part3_frame, fg_color='white')
+        student_frame = ctk.CTkFrame(self.part3_inner_frame, fg_color='white')
         student_label = ctk.CTkLabel(student_frame, text=email, fg_color='white', text_color='black')
         student_label.pack(side="left", padx=10, pady=5)        
 
